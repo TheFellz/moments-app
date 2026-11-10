@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08080a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Moments">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="description" content="Минималистичный счётчик важных дат и событий.">
+  <title>Moments — Счётчик дней</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Moments — на главную">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span>MOMENTS</span>
+      </a>
+      <div class="topbar-right">
+        <span class="live-indicator"><i></i> LIVE</span>
+        <button class="icon-button settings-button" id="addTopButton" aria-label="Создать счётчик" title="Создать счётчик">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow"><span class="eyebrow-line"></span> ВАШЕ ВРЕМЯ. ВАШИ МОМЕНТЫ.</div>
+      <div class="hero-row">
+        <div>
+          <h1>Время имеет<br><em>значение.</em></h1>
+          <p class="hero-copy">События, к которым хочется приблизиться.<br class="desktop-break"> И моменты, которые хочется помнить.</p>
+        </div>
+        <button class="primary-button create-button" id="createButton">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Новый счётчик</span>
+        </button>
+      </div>
+      <div class="hero-meta">
+        <span id="counterSummary">ВАША ЛИЧНАЯ ШКАЛА ВРЕМЕНИ</span>
+        <span class="meta-right"><span class="meta-dot"></span> ОБНОВЛЯЕТСЯ В РЕАЛЬНОМ ВРЕМЕНИ</span>
+      </div>
+    </section>
+
+    <section class="content-section" aria-label="Ваши счётчики">
+      <div class="section-heading">
+        <div><span class="section-kicker">КОЛЛЕКЦИЯ</span><h2>Ваши моменты</h2></div>
+        <span class="count-pill" id="countPill">00</span>
+      </div>
+      <div class="counter-grid" id="counterGrid"></div>
+      <div class="empty-state" id="emptyState" hidden>
+        <div class="empty-orbit">
+          <div class="orbit-ring"></div>
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 9v30M9 24h30"/><circle cx="24" cy="24" r="17"/></svg>
+        </div>
+        <span class="section-kicker">НАЧНИТЕ С ЧЕГО-ТО ВАЖНОГО</span>
+        <h3>У каждого момента<br>есть своя дата.</h3>
+        <p>Добавьте событие, которое ждёте,<br>или дату, которую хотите помнить.</p>
+        <button class="primary-button" id="emptyCreateButton">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Создать первый счётчик
+        </button>
+      </div>
+    </section>
+    <footer class="footer">
+      <span>MADE FOR THE MOMENTS THAT MATTER.</span>
+      <span>© MOMENTS <span id="year"></span></span>
+    </footer>
+  </main>
+
+  <div class="modal-backdrop" id="formBackdrop" aria-hidden="true">
+    <section class="dialog form-dialog" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+      <div class="dialog-top">
+        <span class="dialog-label" id="formEyebrow">НОВОЕ СОБЫТИЕ</span>
+        <button class="icon-button close-button" data-close="form" aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <h2 id="formTitle">Создать<br><em>момент.</em></h2>
+      <p class="dialog-intro">Задайте дату — мы будем следить за временем.</p>
+      <form id="counterForm" novalidate>
+        <input type="hidden" id="editingId">
+        <label class="field">
+          <span class="field-label">НАЗВАНИЕ <b>*</b></span>
+          <input id="eventName" name="name" type="text" maxlength="70" placeholder="Например, большое путешествие" autocomplete="off" required>
+          <small class="field-error" id="nameError"></small>
+        </label>
+        <label class="field">
+          <span class="field-label">ДАТА И ВРЕМЯ <b>*</b></span>
+          <input id="eventDate" name="date" type="datetime-local" required>
+          <small class="field-error" id="dateError"></small>
+        </label>
+        <label class="field">
+          <span class="field-label">ОПИСАНИЕ <span class="optional">НЕОБЯЗАТЕЛЬНО</span></span>
+          <textarea id="eventDescription" name="description" rows="3" maxlength="240" placeholder="Добавьте немного контекста..."></textarea>
+        </label>
+        <div class="field">
+          <span class="field-label">ЦВЕТ АКЦЕНТА</span>
+          <div class="color-palette" id="colorPalette" role="radiogroup" aria-label="Цвет счётчика"></div>
+        </div>
+        <div class="form-actions">
+          <button class="secondary-button" type="button" data-close="form">Отмена</button>
+          <button class="primary-button submit-button" type="submit"><span id="submitLabel">Создать счётчик</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop detail-backdrop" id="detailBackdrop" aria-hidden="true">
+    <section class="dialog detail-dialog" role="dialog" aria-modal="true" aria-labelledby="detailName">
+      <div class="detail-accent" id="detailAccent"></div>
+      <div class="dialog-top">
+        <span class="dialog-label">ВАШ МОМЕНТ</span>
+        <button class="icon-button close-button" data-close="detail" aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="detail-content">
+        <span class="detail-overline"><i id="detailDot"></i><span id="detailStatus">ОТСЧЁТ</span></span>
+        <h2 id="detailName"></h2>
+        <p class="detail-description" id="detailDescription"></p>
+        <div class="detail-timer" id="detailTimer"></div>
+        <div class="detail-units"><span>ДНЕЙ</span><span>ЧАСОВ</span><span>МИНУТ</span><span>СЕКУНД</span></div>
+        <div class="detail-date-block">
+          <span class="field-label">ДАТА СОБЫТИЯ</span>
+          <strong id="detailDate"></strong>
+        </div>
+        <div class="mode-switch" id="modeSwitch" hidden>
+          <span>Показывать</span>
+          <div class="switch-track">
+            <button type="button" class="mode-option active" data-mode="remaining">Осталось</button>
+            <button type="button" class="mode-option" data-mode="elapsed">Прошло</button>
+          </div>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button class="secondary-button" id="deleteButton">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+          Удалить
+        </button>
+        <button class="primary-button" id="editButton">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6 4 4M4 20l4-.8L19 8a2.1 2.1 0 0 0-3-3L5 16l-1 4Z"/></svg>
+          Редактировать
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop confirm-backdrop" id="confirmBackdrop" aria-hidden="true">
+    <section class="dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="confirm-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div>
+      <span class="dialog-label">ПОДТВЕРЖДЕНИЕ</span>
+      <h2 id="confirmTitle">Удалить<br><em>этот момент?</em></h2>
+      <p>Это действие нельзя отменить. Счётчик будет удалён с этого устройства.</p>
+      <div class="form-actions">
+        <button class="secondary-button" id="cancelDelete">Оставить</button>
+        <button class="danger-button" id="confirmDelete">Удалить</button>
+      </div>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
